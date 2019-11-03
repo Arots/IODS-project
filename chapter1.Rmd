@@ -2,3 +2,9 @@
 # About the project
 
 *Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you can use R Markdown syntax.*
+
+# My expectations and learning objectives
+
+##What do you expect to learn? Where did you hear about the course?
+
+*I hope to learn mostly modeling and clustering with r. I think that this course also provides me with the opportunity to refresh my memory on working with r and it's functions.*
