@@ -7,4 +7,4 @@
 
 ##What do you expect to learn? Where did you hear about the course?
 
-*I hope to learn mostly modeling and clustering with r. I think that this course also provides me with the opportunity to refresh my memory on working with r and it's functions.*
+*I hope to learn mostly modeling and clustering with r. I think that this course also provides me with the opportunity to refresh my memory on working with r and it's functions.I I heard about this course from our kvantitative studies teacher Arho Toikka, who highly recommended this course for me. Seeing as i was already very interested about data science, this seemed like the perfect opportunity to better my knowledge on the matter.*
