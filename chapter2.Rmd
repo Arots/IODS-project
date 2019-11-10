@@ -30,6 +30,9 @@ ggpairs(analysisData, lower = list(combo = wrap("facethist", bins = 20)))
 
 *In out pairs plot we can see that the correlations between the variables are quite low. Only a real significant correlation can be found between attitude and points (0,44) and deep learning strategies and surface level strategies (the correlation between the two strategies is negative).* 
 
+### Distributions of variances
+*Almost all of the variances of the variables are noramlly distributed.Tge onyl exception is age, which is explained due to the fact that the participants of the survey are students, who are young and mostly the same age.*
+
 ### Distribution of residuals 
 *In most of the cases we cannot see a clear linear pattern in the residuals between two variables. Some show a clear pattern, like attitude and surface learning strategies, where the residuals are skewed towards negative values.*
 
@@ -44,7 +47,7 @@ summary(myRegressionModel)
 secondModel <- lm(Points ~ Attitude, data = analysisData)
 summary(secondModel)
 
-*In the second model, we can see that the students attitudes have an extremly significant causal relation to the points that they receive in the final exam. This means that the likelyhood to get a dataset this deviant is less than one percent. In this model one point in attitude increased the points that a student got in the exam by 0.35.*
+*In the second model, we can see that the students attitudes have an extremly significant causal relation to the points that they receive in the final exam. This means that the likelyhood to get a dataset this deviant is less than one percent. In this model one point in attitude increased the points that a student got in the exam by 0.35. The multiple R-squared means that the variance of the points in the test can be explained by about 19 percent by the differences in the attitudes of the students.*
 
 ## 5. Diagnostic plots
 
