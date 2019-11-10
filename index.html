@@ -388,8 +388,12 @@ summary {
 <div id="TOC">
 <ul>
 <li><a href="#about-the-project">About the project</a></li>
-<li><a href="#my-expectations-and-learning-objectives">My expectations and learning objectives</a></li>
-<li><a href="#insert-chapter-2-title-here">Insert chapter 2 title here</a></li>
+<li><a href="#my-expectations-and-learning-objectives">My expectations and learning objectives</a><ul>
+<li><a href="#reading-the-data-and-describing-it">1. Reading the data and describing it</a></li>
+<li><a href="#graphical-overview-of-the-data">2. Graphical overview of the data</a></li>
+<li><a href="#own-linear-regression-model-4.-summary-of-the-fitted-model">3. Own linear regression model &amp; 4. Summary of the fitted model</a></li>
+<li><a href="#diagnostic-plots">5. Diagnostic plots</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -403,16 +407,47 @@ summary {
 <p>##What do you expect to learn? Where did you hear about the course?</p>
 <p><em>I hope to learn mostly modeling and clustering with r. I think that this course also provides me with the opportunity to refresh my memory on working with r and it’s functions.I I heard about this course from our kvantitative studies teacher Arho Toikka, who highly recommended this course for me. Seeing as i was already very interested about data science, this seemed like the perfect opportunity to better my knowledge on the matter.</em></p>
 <hr />
+<p>install.packages(“dplyr”)</p>
+<p>#asdas install.packages(“ggplot2”)</p>
+<p>install.packages(“GGally”)</p>
+<p>library(dplyr)</p>
+<p>library(ggplot2)</p>
+<p>library(GGally) <em>Describe the work you have done this week and summarize your learning.</em></p>
+<p><em>Describe your work and results clearly.</em> <em>Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.</em> <em>Assume the reader has no previous knowledge of your data or the more advanced methods you are using. </em></p>
+<div id="reading-the-data-and-describing-it" class="section level2">
+<h2>1. Reading the data and describing it</h2>
+<p>analysisData &lt;- read.table(‘data/learning2014’) summary(analysisData$Points)</p>
+<p><em>This data is collected from the social science students of the Univeristy of Helsinki. The survey was conducted in a social sciences statistical course for bachelor students in 2014 December to 2015 January. The survey consists of 7 variables that describe the gender (factored as female or male), age, attitude (towards the study of statistics), deep learning (pupils own attitudes and practices towards deep learning), surface learning and strategic learning as well as their received points in the final exam of the course. The learning scales mostly try to get the student to show what kind of strategies and types of learning they try to implement in their studies. All the learning categories are number values in likert-scales (values from 1 to 5). Points, attitude and age are integer values. The survey was completed in Finnish.</em></p>
 </div>
-<div id="insert-chapter-2-title-here" class="section level1">
-<h1>Insert chapter 2 title here</h1>
-<p><em>Describe the work you have done this week and summarize your learning.</em></p>
-<ul>
-<li>Describe your work and results clearly.</li>
-<li>Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.</li>
-<li>Assume the reader has no previous knowledge of your data or the more advanced methods you are using.</li>
-</ul>
+<div id="graphical-overview-of-the-data" class="section level2">
+<h2>2. Graphical overview of the data</h2>
+<p>ggpairs(analysisData, lower = list(combo = wrap(“facethist”, bins = 20)))</p>
+<div id="correlation-between-variables" class="section level3">
+<h3>Correlation between variables</h3>
+<p><em>In out pairs plot we can see that the correlations between the variables are quite low. Only a real significant correlation can be found between attitude and points (0,44) and deep learning strategies and surface level strategies (the correlation between the two strategies is negative).</em></p>
+</div>
+<div id="distributions-of-variances" class="section level3">
+<h3>Distributions of variances</h3>
+<p><em>Almost all of the variances of the variables are noramlly distributed.Tge onyl exception is age, which is explained due to the fact that the participants of the survey are students, who are young and mostly the same age.</em></p>
+</div>
+<div id="distribution-of-residuals" class="section level3">
+<h3>Distribution of residuals</h3>
+<p><em>In most of the cases we cannot see a clear linear pattern in the residuals between two variables. Some show a clear pattern, like attitude and surface learning strategies, where the residuals are skewed towards negative values.</em></p>
+</div>
+</div>
+<div id="own-linear-regression-model-4.-summary-of-the-fitted-model" class="section level2">
+<h2>3. Own linear regression model &amp; 4. Summary of the fitted model</h2>
+<p>myRegressionModel &lt;- lm(Points ~ Attitude + stra + surf, data = analysisData) summary(myRegressionModel)</p>
+<p><em>Here i created a linear regression model where the students attitude, strategic learning techniques and surface techniques try to explain the students achievement levels in the final exam of the course. In this first model, we can see that surface and stategic learning do not have any significance on the students outcomes in the course test. Their attitude towards the study of statistics, however, proves to be very significant.</em></p>
+<p>secondModel &lt;- lm(Points ~ Attitude, data = analysisData) summary(secondModel)</p>
+<p><em>In the second model, we can see that the students attitudes have an extremly significant causal relation to the points that they receive in the final exam. This means that the likelyhood to get a dataset this deviant is less than one percent. In this model one point in attitude increased the points that a student got in the exam by 0.35. The multiple R-squared means that the variance of the points in the test can be explained by about 19 percent by the differences in the attitudes of the students.</em></p>
+</div>
+<div id="diagnostic-plots" class="section level2">
+<h2>5. Diagnostic plots</h2>
+<p>par(mfrow = c(2,2)) plot(x=secondModel, which= c(1,2,5))</p>
+<p><em>In the assumptions of the model, we assume the variables are normally distributed and that their variance is constant. From the residuals vs fitted, we can see that there seems to be no clear pattern in the distribution of the variables and thefore we can conclude that the model is quite linear. Also the variance is seems to be quite constant as the datapoints dont seem to stray too much from the mean. The In the normalQQ- plot we can see that our data pretty much follows the line. This means that the data is normally distributed. In the residuals and leverage plot we see that there arent really any outliers that have a big leverage on the rest of the data. The data is bit skewed down, but not significantly.</em></p>
 <hr />
+</div>
 </div>
 
 
