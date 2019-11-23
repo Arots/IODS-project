@@ -1,0 +1,174 @@
+---
+title: "chapter4"
+author: "Otso Aro"
+date: "11/23/2019"
+output: html_document
+---
+
+# Chapter 4 exercises - classification and clustering
+
+## 1) Loading the data into the rmd-file
+```{r}
+library(tidyverse)
+library(corrplot)
+library(MASS)
+library(dplyr)
+library(ggplot2)
+str(Boston)
+summary(Boston)
+?Boston
+```
+## 2) Structure and dimensions of the dataset
+
+*In this exercise we will be using the Housing balues in the suburbs of Boston - dataset. The dataset has 506 observations and 14 variables. Variables are:*
+
+*crim = crimerate per capita, zn = proportion of residental land, indus = proportion of non-retail business (industry) acres per town, black = proportions of blacks by town. and other population and housing situation describing variables in the Boston suburbs. Here we will be focusing mostly on the crimerates.*
+
+
+## 3) Summaries of the variables of the data
+
+*I will now use pairs and the correlation plot to describe the relationships between variables.*
+```{r}
+
+pairs(Boston)
+# calculate the correlation matrix and round it
+cor_matrix<-cor(Boston) 
+
+# print the correlation matrix
+cor_matrix
+cor_matrix %>% round(digits = 2)
+
+# visualize the correlation matrix
+corrplot(cor_matrix, method="circle", type = "upper", cl.pos = "b", tl.pos = "d", tl.cex = 0.6)
+```
+
+*There are many variables that have a positive and negative correlation together. As we can see from the correlation plot, the strngest correlation between variables seems to be with the index of accessibility to radial highways and full property-tax rate per ten thousand dollars. Strong negative correlation can be found between variables such as the proportion of owner-occupied units prior to 1940 (age-variable) and the weighted mean of distances to the Boston employment centres (dis). The red dots convey a more negative correlation and blue dots a positive one. The bigger the circle seems to be, the more darker the color and the stronger the correlation.*
+
+
+## 4) Standardizing the data and summary of scaled data
+
+```{r}
+# center and standardize variables
+boston_scaled <- scale(Boston)
+
+# summaries of the scaled variables
+summary(boston_scaled)
+
+# class of the boston_scaled object
+class(boston_scaled)
+
+# change the object to data frame
+boston_scaled <- as.data.frame(boston_scaled)
+
+# create a quantile vector of crim and print it
+bins <- quantile(boston_scaled$crim)
+bins
+
+# create a categorical variable 'crime'
+crime <- cut(boston_scaled$crim, labels = c("low", "med_low", "med_high", "high"), breaks = c(bins), include.lowest = TRUE)
+
+# look at the table of the new factor crime
+table(crime)
+
+# remove original crim from the dataset
+boston_scaled <- dplyr::select(boston_scaled, -crim)
+
+# add the new categorical value to scaled data
+boston_scaled <- data.frame(boston_scaled, crime)
+
+# number of rows in the Boston dataset 
+n <- nrow(boston_scaled)
+
+# choose randomly 80% of the rows
+ind <- sample(n,  size = n * 0.8)
+
+# create train set
+train <- boston_scaled[ind,]
+
+# create test set 
+test <- boston_scaled[-ind,]
+
+```
+
+*Here our goal is to standardize the data for further analysis, so we scale it (scaling reduces the mean from each column value and divides it by standard deviation). Furthermore we divide the crime-variable into quantiles and give the quantiles labels. Now the crimerates of each area of the suburbs of Boston become a categorical variable. Lastly we drop the old crimrate variable from the dataframe and add the new one into it's place. Then we divide the data into 5 categories which 4 are meant for testing and 1 is meant for training our clustering and classification models. *
+
+## 5) Fitting the linear discriminant analysis
+
+```{r}
+# linear discriminant analysis
+lda.fit <- lda(crime ~ ., data = train)
+
+# print the lda.fit object
+lda.fit
+
+# target classes as numeric
+classes <- as.numeric(train$crime)
+
+# plot the lda results
+plot(lda.fit, dimen = 2, col = classes, pch = classes)
+
+```
+
+*Here we create a linear discriminate analysis model with crimerates as the target variable. Our explanatory variable is all of the other variables.* 
+
+
+## 6) Predicting classes with the linear discriminant analysis - model
+
+```{r}
+# save the correct classes from test data
+correct_classes <- test$crime
+
+# remove the crime variable from test data
+test <- dplyr::select(test, -crime)
+
+# predict classes with test data
+lda.pred <- predict(lda.fit, newdata = test)
+
+# cross tabulate the results
+table(correct = correct_classes, predicted = lda.pred$class)
+```
+*Here we cross-tabled our predictive model and it's results with the correct results of the dataset. Our model was quite good at predicting high - crimerate areas. However the model is prone to uncorrectly predict medium high crimerate areas to medium lows, medium low areas to lows and low crimerate areas to medium low. The higher the crimerate are turly was, the better the power of the models prediction.*
+
+
+## 7) Using K-means to calculate distances between observations
+
+```{r}
+library(MASS)
+
+# Scale the variables to get comparable distances
+boston_scaled2 <- scale(Boston)
+
+# k-means clustering
+km <-kmeans(Boston, centers = 3)
+
+# plot the Boston dataset with clusters
+pairs(Boston, col = km$cluster)
+
+set.seed(123)
+
+# determine the number of clusters
+k_max <- 10
+
+# calculate the total within sum of squares
+twcss <- sapply(1:k_max, function(k){kmeans(Boston, k)$tot.withinss})
+
+# visualize the results
+qplot(x = 1:k_max, y = twcss, geom = 'line')
+
+# k-means clustering
+km <-kmeans(Boston, centers = 2)
+
+# plot the Boston dataset with clusters
+pairs(Boston, col = km$cluster)
+
+# plot the Boston dataset clusters in sets of 5
+pairs(Boston[1:5], col = km$cluster)
+pairs(Boston[6:10], col = km$cluster)
+pairs(Boston[11:14], col = km$cluster)
+
+```
+
+*As we can see from our plot calculating the wcss of our klustering, the value of wcss dramatically drops when we have two clusters instead of one. When we add additional clusters to it, the value does not change all that much. Therefore it seems most reasonable to continue to kluster the variables with k-means using two clusters.*
+
+*In the above example I plotted the variables with each other using the pairs- function. The pairs have been illustrated in sets of 5, from the first variable to the fifth, sixth to tenth and eleventh to fourteenth (only 14 variables in the data), to help with the visualization. In many of the cases the clusters are quite unclear and the clusters usually are made into "low" and "high" - categories. *
+
