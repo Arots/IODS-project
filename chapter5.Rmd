@@ -8,13 +8,22 @@ output: html_document
 # Exercise 5
 
 ## Loading packages and the human-data into the file
-```{r}
+install.packages("dplyr", repos = "http://cran.us.r-project.org")
+install.packages("tidyr", repos = "http://cran.us.r-project.org")
+install.packages("stringr", repos = "http://cran.us.r-project.org")
+install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+install.packages("GGally", repos = "http://cran.us.r-project.org")
+install.packages("corrplot", repos = "http://cran.us.r-project.org")
+install.packages("FactoMineR", repos = "http://cran.us.r-project.org")
+
+
 library(dplyr)
 library(tidyr)
 library(stringr)
 library(ggplot2)
 library(GGally)
 library(corrplot)
+```{r}
 human <- read.table("/Users/Lotta/IODS-project/data/human", header = TRUE)
 ```
 
@@ -87,7 +96,6 @@ biplot(pca_human, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab
 
 ## 5)  Visualize tha variables in barplots
 ```{r}
-install.packages("FactoMineR")
 library(FactoMineR)
 data(tea)
 
