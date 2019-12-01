@@ -54,3 +54,81 @@ human <- inner_join(hd, gii, by = join_by, suffix = c(".hd", ".gii"))
 str(human)
 
 write.table(human, file = "data/human")
+
+human
+# Data wrangling 4
+## read the human- data into the file and view its structure
+
+
+str(human)
+"The human - dataset is a combination of girl inequality index and human development index from United Nations. 
+It has been joined together using the Country - variable, that was common in both datasets. The dataset rows are countries.
+The remaining variables include:
+HDI.Rank - Ranking in United Nations human development index.
+HIDnum - A numeral rank of human development index rating
+lifeExpectancy - Life expectancy in each country
+eduExpectancy - Expectancy of educational years in each country per person
+meanEdu - The mean of years of education in the population
+GNICapita - Gross national income per capita
+GNI HDI - GNI rank minus the HDI rank
+GII.Rank - Ranking in gender inequality index for a specific country
+mother Mortality - ratio of the mortality of mothers
+teenMoms - which is the percentage of adolecent mothers in the countries
+parliamentRep - The percentage of the parliament representatives that are women in each country
+secEduF - percentage of women that attain secondary education
+secEduM - percentage of men that attain secondary education
+eduDiff - the ratio of women to men in attaining higher education
+workDiff - the ratio of women to men as part of the workforce"
+
+
+## 1) Mutate the GNI variable into a numeric one from a character based value
+
+### access the stringr and tidyr package
+library(stringr)
+library(tidyr)
+
+str(human)
+
+### remove the commas from GNI and print out a numeric version of it
+human$GNICapita <- str_replace(human$GNICapita, pattern=",", replace ="") %>% as.numeric
+
+## 2) Keep only certain columns
+str(human)
+
+### columns to keep
+keep <- c("Country", "eduDiff", "workDiff", "lifeExpectancy", "eduExpectancy", "GNICapita", "motherMortality", "teenMoms", "parliamentRep")
+
+### select the 'keep' columns
+human <- dplyr::select(human, one_of(keep))
+
+## 3) Remove all the rows with missing values
+
+human <- filter(human, complete.cases(human))
+str(human)
+human
+
+
+## 4) Remove all the observations that relate to regions instead of countries
+
+tail(human, 10)
+
+### define the last indice we want to keep
+last <- nrow(human) - 7
+
+### choose everything until the last 7 observations
+human <- human[1:last, ]
+
+str(human)
+
+## 5) Define rownames by the country
+
+### add countries as rownames
+rownames(human) <- human$Country
+
+### Remove the country column from the data
+human$Country <- NULL
+str(human)
+
+### Overwrite old human data
+write.table(human, file = "data/human")
+str(human)

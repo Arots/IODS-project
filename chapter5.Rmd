@@ -1,0 +1,125 @@
+---
+title: "chapter5"
+author: "Otso Aro"
+date: "12/1/2019"
+output: html_document
+---
+
+# Exercise 5
+
+## Loading packages and the human-data into the file
+```{r}
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(ggplot2)
+library(GGally)
+library(corrplot)
+human <- read.table("/Users/Lotta/IODS-project/data/human", header = TRUE)
+```
+
+## 1) VIsualizing the human - variables and explaning the structure
+```{r}
+# visualize the 'human' variables
+ggpairs(human)
+str(human)
+summary(human)
+
+# compute the correlation matrix and visualize it with corrplot
+cor(human) %>% corrplot
+```
+*We have a dataset consisting of 155 observations and 8 variables. In the plots and especially correlation plot we can see that there is a string positive correlation between life expectancy and education expectancy. Also other notable correlations are: *
+
+*Mother mortalityrate  and life expectancy (negtive correlation).*
+*GNI and life expectancy and educational expectancy*
+*GNI and mothers mortality and adolecent birthrate (small negative correlation)*
+
+
+
+## 2) Principal component analysis (PCA)
+```{r}
+
+# perform principal component analysis (with the SVD method)
+pca_human <- prcomp(human)
+
+# draw a biplot of the principal component representation and the original variables
+biplot(pca_human, choices = 1:2, cex = c(0.8, 1), col = c("grey40", "deeppink2"))
+
+```
+
+
+## 3) Standardize the dataset and perform PCA again
+```{r}
+# standardize the variables
+human_std <- scale(human)
+
+# print out summaries of the standardized variables
+summary(human_std)
+
+# perform principal component analysis (with the SVD method)
+pca_human <- prcomp(human_std)
+pca_human
+
+# draw a biplot of the principal component representation and the original variables
+biplot(pca_human, choices = 1:2, cex = c(0.8, 1), col = c("grey40", "deeppink2"))
+
+# create and print out a summary of pca_human
+s <- summary(pca_human)
+
+# rounded percentages of variance captured by each PC
+pca_pr <- round(100*s$importance[2,], digits = 1) 
+
+# print out the percentages of variance
+pca_pr
+
+# create object pc_lab to be used as axis labels
+pc_lab <- paste0(names(pca_pr), " (", pca_pr, "%)")
+
+# draw a biplot
+biplot(pca_human, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
+
+```
+*When we did not scale our variables our principal component analysis didnt know how to deal with the variance of each of our variable. Therefore the result was that almost all of our variables had variance that the analysis could not handle. Stronger variance results in more important variables, but because the variables were not scaled certain variables might have had a falty variance. After the scaling this was not the case.*
+
+## 4)
+*We can see that the first principal component (dimension) resulted of 53.6 % of variance of our variables. The second principal component resulted in 16.2 % of the variables variance. Our analysis was able to therefore separate two strong principal components that are not correlated with each other.*
+
+
+## 5)  Visualize tha variables in barplots
+```{r}
+install.packages("FactoMineR")
+library(FactoMineR)
+data(tea)
+
+
+str(tea)
+
+# column names to keep in the dataset
+keep_columns <- c("Tea", "How", "how", "sugar", "where", "lunch")
+
+# select the 'keep_columns' to create a new dataset
+tea_time <- dplyr::select(tea, one_of(keep_columns))
+
+# look at the summaries and structure of the data
+summary(tea_time)
+str(tea_time)
+
+# visualize the dataset
+gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+
+```
+*Here in the first plot we can see that many of the people that drink tea most likely like to drink it without sugar, earl gray and at a chain store. The tea should be drunk at a time that is not lunch and is from a tea bag.*
+
+### Do the multivariate component analysis
+```{r}
+# multiple correspondence analysis
+mca <- MCA(tea_time, graph = FALSE)
+
+# summary of the model
+summary(mca)
+
+# visualize MCA
+plot(mca, invisible=c("ind"), habillage = "quali")
+```
+
+*Dimension one accounts for 15.24% percentage of the variance of the variabes assigned to it. The second dimension is not the significantly less important as it covers 14.23% of the variance. People that want to drink their tea from a tea bag most likely want to drink it at a chain store and with sugar. They also tend to want to drink Earl Gray. Participants that want unpackaged tea usually go for more green tea in a tea shop.*
